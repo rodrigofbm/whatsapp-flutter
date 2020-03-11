@@ -1,6 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:whatsapp_cone/mixins/forms.dart';
 import 'package:whatsapp_cone/src/cadastrate.dart';
+import 'package:whatsapp_cone/src/models/usuario.model.dart';
+
+import 'home.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -8,6 +12,35 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> with Forms {
+  FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+  TextEditingController _controllerEmail = TextEditingController();
+  TextEditingController _controllerPassword = TextEditingController();
+
+  Future verifyUserLoged() async {
+    FirebaseUser user = await firebaseAuth.currentUser();
+
+    if (user != null)
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => Home()));
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    verifyUserLoged();
+  }
+
+  login() {
+    Usuario user = Usuario("", _controllerEmail.text, _controllerPassword.text);
+
+    firebaseAuth
+        .signInWithEmailAndPassword(email: user.email, password: user.password)
+        .then((user) {
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => Home()));
+    }).catchError(print);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,9 +60,31 @@ class _LoginState extends State<Login> with Forms {
                     height: 150,
                   ),
                 ),
-                textInput("E-mail", keyboardType: TextInputType.emailAddress),
-                textInput("Password", obscure: true),
-                primaryButton(label: "Log In"),
+                textInput("E-mail",
+                    keyboardType: TextInputType.emailAddress,
+                    controller: _controllerEmail),
+                textInput("Password",
+                    obscure: true, controller: _controllerPassword),
+                Padding(
+                  padding: EdgeInsets.only(top: 8, bottom: 10),
+                  child: RaisedButton(
+                    onPressed: () {
+                      login();
+                    },
+                    padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
+                    color: Colors.green,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(32),
+                    ),
+                    child: Text(
+                      "Log In",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20.0,
+                      ),
+                    ),
+                  ),
+                ),
                 Center(
                   child: GestureDetector(
                     onTap: () {

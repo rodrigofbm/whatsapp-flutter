@@ -25,11 +25,13 @@ abstract class Forms {
     );
   }
 
-  Widget primaryButton({String label}) {
+  Widget primaryButton({Function btnPressed(), String label}) {
     return Padding(
       padding: EdgeInsets.only(top: 8, bottom: 10),
       child: RaisedButton(
-        onPressed: () {},
+        onPressed: () {
+          btnPressed();
+        },
         padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
         color: Colors.green,
         shape: RoundedRectangleBorder(
